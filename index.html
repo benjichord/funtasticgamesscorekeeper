@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScoreKeeper — Track Every Game</title>
+  <meta name="description" content="Scorecards, calculators, and mini-games for every game night. Board games, card games, dice, sports, and more. No ads. No accounts. Just play." />
+
+  <!-- Fonts — Nunito mirrors SF Pro Rounded's warmth -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── Tokens (mirrors the SwiftUI app palette) ────────────────── */
+    :root {
+      --cream:        #FBF5E8;
+      --cream-mid:    #F4ECD6;
+      --cream-dark:   #EDE0C4;
+      --brown:        #2A1F0E;
+      --brown-light:  #7A6848;
+      --card-red:     #D63B30;
+      --board-teal:   #1AA8B4;
+      --dice-purple:  #9235C0;
+      --tile-green:   #4DA85A;
+      --computer-dg:  #1A7040;
+      --sports-blue:  #2878D0;
+      --group-indigo: #4428A0;
+      --gold:         #C89830;
+      --white:        #FFFFFF;
+      --shadow-sm:    0 2px 8px rgba(42,31,14,.08);
+      --shadow-md:    0 6px 24px rgba(42,31,14,.11);
+      --shadow-lg:    0 16px 48px rgba(42,31,14,.14);
+      --radius-sm:    12px;
+      --radius-md:    18px;
+      --radius-lg:    26px;
+      --radius-pill:  999px;
+    }
+
+    body {
+      font-family: 'Nunito', -apple-system, 'SF Pro Rounded', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--cream);
+      color: var(--brown);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navigation ──────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(251, 245, 232, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(42,31,14,.08);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--brown);
+      font-weight: 900;
+      font-size: 1.2rem;
+      letter-spacing: -.3px;
+      flex-shrink: 0;
+    }
+
+    .nav-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--card-red), #a0230e);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(214,59,48,.35);
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--brown-light);
+      font-weight: 700;
+      font-size: .9rem;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      transition: background .15s, color .15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--cream-dark);
+      color: var(--brown);
+    }
+
+    .nav-download {
+      background: var(--brown) !important;
+      color: var(--cream) !important;
+      padding: 9px 18px !important;
+      border-radius: var(--radius-pill) !important;
+      font-weight: 800 !important;
+      font-size: .88rem !important;
+      transition: opacity .15s !important;
+    }
+
+    .nav-download:hover { opacity: .82; background: var(--brown) !important; }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 72px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--cream-dark);
+      border: 1px solid rgba(42,31,14,.12);
+      border-radius: var(--radius-pill);
+      padding: 5px 13px;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--brown-light);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.13;
+      letter-spacing: -.5px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--card-red);
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--brown-light);
+      line-height: 1.65;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-appstore {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--brown);
+      color: var(--cream);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: .95rem;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .btn-appstore:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-appstore svg { flex-shrink: 0; }
+
+    .btn-appstore-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .btn-appstore-sub .eyebrow {
+      font-size: .65rem;
+      font-weight: 700;
+      opacity: .72;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+
+    .btn-appstore-sub .label {
+      font-size: 1rem;
+      font-weight: 900;
+    }
+
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--cream-dark);
+      border: 1px solid rgba(42,31,14,.1);
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--brown-light);
+    }
+
+    .hero-badge .dot {
+      width: 8px; height: 8px;
+      background: var(--tile-green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(77,168,90,.2);
+    }
+
+    /* ── Phone Mockup ────────────────────────────────────────────── */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone {
+      width: 280px;
+      background: #1C1C1E;
+      border-radius: 46px;
+      padding: 14px;
+      box-shadow:
+        0 0 0 1.5px #3A3A3C,
+        0 30px 80px rgba(0,0,0,.38),
+        0 8px 24px rgba(0,0,0,.24);
+      position: relative;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px; height: 28px;
+      background: #1C1C1E;
+      border-radius: 0 0 18px 18px;
+      z-index: 2;
+    }
+
+    .phone-screen {
+      background: var(--cream);
+      border-radius: 34px;
+      overflow: hidden;
+      height: 560px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fake status bar */
+    .phone-statusbar {
+      height: 46px;
+      background: var(--cream);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 20px 6px;
+      flex-shrink: 0;
+    }
+
+    .phone-statusbar .time {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--brown);
+    }
+
+    .phone-statusbar .icons {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .phone-statusbar .icons span {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--brown);
+    }
+
+    /* Fake nav bar */
+    .phone-navbar {
+      background: var(--cream);
+      border-bottom: 1px solid rgba(42,31,14,.08);
+      padding: 8px 16px 10px;
+      flex-shrink: 0;
+    }
+
+    .phone-navbar .title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--brown);
+    }
+
+    /* Fake app content */
+    .phone-content {
+      flex: 1;
+      overflow: hidden;
+      padding: 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .phone-section-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--brown-light);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      padding: 0 2px;
+    }
+
+    .phone-game-row {
+      display: flex;
+      gap: 7px;
+    }
+
+    .phone-game-card {
+      flex: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(42,31,14,.1);
+    }
+
+    .phone-game-thumb {
+      height: 46px;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .phone-game-label {
+      background: white;
+      padding: 4px 6px 5px;
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--brown);
+      line-height: 1.2;
+    }
+
+    .phone-category-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .phone-cat-tile {
+      border-radius: 10px;
+      padding: 10px 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .phone-cat-icon {
+      font-size: 15px;
+    }
+
+    .phone-cat-name {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: white;
+      line-height: 1.2;
+    }
+
+    /* ── Section shared ──────────────────────────────────────────── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+
+    .section-eyebrow {
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--brown-light);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: -.3px;
+      line-height: 1.18;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brown-light);
+      line-height: 1.65;
+      max-width: 560px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Category Cards ──────────────────────────────────────────── */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .cat-card {
+      border-radius: var(--radius-md);
+      padding: 24px 20px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+      transition: transform .18s, box-shadow .18s;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.14) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .cat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .cat-card-icon { font-size: 2rem; line-height: 1; }
+
+    .cat-card-name {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: -.2px;
+    }
+
+    .cat-card-desc {
+      font-size: .82rem;
+      font-weight: 600;
+      opacity: .82;
+      line-height: 1.5;
+    }
+
+    .cat-card-count {
+      font-size: .75rem;
+      font-weight: 800;
+      opacity: .65;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-top: auto;
+      padding-top: 8px;
+    }
+
+    /* ── Perks / Features ────────────────────────────────────────── */
+    .perks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .perk-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 24px 22px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(42,31,14,.07);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform .18s, box-shadow .18s;
+    }
+
+    .perk-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .perk-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .perk-title {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -.2px;
+    }
+
+    .perk-desc {
+      font-size: .87rem;
+      font-weight: 600;
+      color: var(--brown-light);
+      line-height: 1.6;
+    }
+
+    /* ── Divider band ────────────────────────────────────────────── */
+    .band {
+      background: var(--cream-mid);
+      border-top: 1px solid rgba(42,31,14,.07);
+      border-bottom: 1px solid rgba(42,31,14,.07);
+    }
+
+    /* ── Privacy Policy ──────────────────────────────────────────── */
+    .prose {
+      max-width: 720px;
+    }
+
+    .prose h3 {
+      font-size: 1.1rem;
+      font-weight: 900;
+      margin: 28px 0 8px;
+      color: var(--brown);
+    }
+
+    .prose h3:first-child { margin-top: 0; }
+
+    .prose p, .prose li {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--brown-light);
+      line-height: 1.72;
+      margin-bottom: 8px;
+    }
+
+    .prose ul {
+      padding-left: 20px;
+      margin-bottom: 8px;
+    }
+
+    .prose a {
+      color: var(--card-red);
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .prose a:hover { text-decoration: underline; }
+
+    .prose .updated {
+      display: inline-block;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--brown-light);
+      background: var(--cream-dark);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Feedback ────────────────────────────────────────────────── */
+    .feedback-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 40px 40px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(42,31,14,.07);
+      max-width: 640px;
+    }
+
+    .feedback-card h3 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .feedback-card p {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--brown-light);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .feedback-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feedback-method {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid rgba(42,31,14,.1);
+      text-decoration: none;
+      color: var(--brown);
+      font-weight: 800;
+      font-size: .93rem;
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+
+    .feedback-method:hover {
+      background: var(--cream);
+      border-color: var(--card-red);
+      transform: translateX(3px);
+    }
+
+    .feedback-method-icon {
+      width: 40px; height: 40px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .feedback-method-text { display: flex; flex-direction: column; gap: 1px; }
+    .feedback-method-label { font-weight: 900; font-size: .93rem; }
+    .feedback-method-sub { font-weight: 600; font-size: .78rem; color: var(--brown-light); }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      background: var(--brown);
+      color: var(--cream);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--cream);
+      text-decoration: none;
+    }
+
+    .footer-logo-icon {
+      width: 34px; height: 34px;
+      background: rgba(251,245,232,.14);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+    }
+
+    .footer-copy {
+      font-size: .83rem;
+      font-weight: 600;
+      color: rgba(251,245,232,.5);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: rgba(251,245,232,.65);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .85rem;
+      transition: color .15s;
+    }
+
+    .footer-links a:hover { color: var(--cream); }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 52px 24px 56px;
+        gap: 40px;
+      }
+
+      .hero-sub { margin-left: auto; margin-right: auto; }
+      .hero-cta { justify-content: center; }
+      .phone-wrap { order: -1; }
+      .phone { width: 240px; }
+      .phone-screen { height: 480px; }
+    }
+
+    @media (max-width: 560px) {
+      .nav-inner { padding: 0 16px; }
+      .nav-download { display: none; }
+      .section { padding: 52px 16px; }
+      .feedback-card { padding: 28px 20px; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════
+     NAV
+     ════════════════════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">🎯</div>
+      ScoreKeeper
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-links">
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#feedback">Feedback</a>
+      <a href="#download" class="nav-download">Download</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     HERO
+     ════════════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">
+      <span>🎲</span> Available on iPhone &amp; iPad
+    </div>
+    <h1>Keep Score for <em>Every</em> Game Night</h1>
+    <p class="hero-sub">
+      Scorecards, smart calculators, and playable mini-games for board games,
+      card games, dice games, sports, and more. No ads. No accounts. Everything
+      stays private on your device.
+    </p>
+    <div class="hero-cta">
+      <a id="download" href="#" class="btn-appstore">
+        <!-- Apple logo -->
+        <svg width="22" height="26" viewBox="0 0 22 26" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.07 13.79c-.03-3.19 2.6-4.74 2.72-4.82-1.48-2.17-3.79-2.47-4.61-2.5-1.97-.2-3.84 1.16-4.84 1.16-1 0-2.55-1.13-4.2-1.1-2.16.03-4.16 1.25-5.27 3.17C-.5 13.77.79 19.5 3.3 22.6c1.24 1.77 2.72 3.75 4.66 3.68 1.87-.08 2.58-1.2 4.84-1.2 2.25 0 2.9 1.2 4.86 1.17 2.02-.04 3.29-1.8 4.52-3.58 1.43-2.05 2.02-4.04 2.05-4.14-.04-.01-3.93-1.51-3.96-5.74zM14.64 4.34C15.67 3.1 16.35 1.4 16.16 0c-1.47.06-3.25.98-4.3 2.21-.95 1.08-1.77 2.82-1.55 4.48 1.63.13 3.3-.83 4.33-2.35z"/>
+        </svg>
+        <div class="btn-appstore-sub">
+          <span class="eyebrow">Download on the</span>
+          <span class="label">App Store</span>
+        </div>
+      </a>
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Free to download
+      </div>
+    </div>
+  </div>
+
+  <!-- CSS Phone Mockup -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-statusbar">
+          <span class="time">9:41</span>
+          <div class="icons"><span>●●●</span><span>WiFi</span><span>100%</span></div>
+        </div>
+        <div class="phone-navbar">
+          <div class="title">ScoreKeeper</div>
+        </div>
+        <div class="phone-content">
+          <div class="phone-section-label">Frequently Played</div>
+          <div class="phone-game-row">
+            <div class="phone-game-card">
+              <div class="phone-game-thumb" style="background:linear-gradient(135deg,#1C2B3A,#2B4A6A)"></div>
+              <div class="phone-game-label">Blackjack</div>
+            </div>
+            <div class="phone-game-card">
+              <div class="phone-game-thumb" style="background:linear-gradient(135deg,#3A1A1A,#7A1A28)"></div>
+              <div class="phone-game-label">Yahtzee</div>
+            </div>
+            <div class="phone-game-card">
+              <div class="phone-game-thumb" style="background:linear-gradient(135deg,#0D2B1A,#1A5A38)"></div>
+              <div class="phone-game-label">Cribbage</div>
+            </div>
+          </div>
+          <div class="phone-section-label" style="margin-top:2px">Browse Categories</div>
+          <div class="phone-category-row">
+            <div class="phone-cat-tile" style="background:linear-gradient(135deg,#c03228,#8a1e16)">
+              <span class="phone-cat-icon">♠️</span>
+              <span class="phone-cat-name">Card Games</span>
+            </div>
+            <div class="phone-cat-tile" style="background:linear-gradient(135deg,#15939e,#0d6870)">
+              <span class="phone-cat-icon">⬜</span>
+              <span class="phone-cat-name">Board Games</span>
+            </div>
+            <div class="phone-cat-tile" style="background:linear-gradient(135deg,#7e28a8,#551880)">
+              <span class="phone-cat-icon">🎲</span>
+              <span class="phone-cat-name">Dice Games</span>
+            </div>
+            <div class="phone-cat-tile" style="background:linear-gradient(135deg,#226ec0,#154a88)">
+              <span class="phone-cat-icon">🏆</span>
+              <span class="phone-cat-name">Sports</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     GAME CATEGORIES
+     ════════════════════════════════════════════════════════════════ -->
+<div class="band">
+  <div class="section">
+    <div class="section-eyebrow">What's inside</div>
+    <h2 class="section-title">One app for every game you play</h2>
+    <p class="section-sub">
+      50+ games covered across 7 categories — from classic card games to custom dice rolls.
+      Each one built to feel native to that game.
+    </p>
+    <div class="category-grid">
+      <div class="cat-card" style="background:linear-gradient(135deg,#c03228,#8a1e16)">
+        <div class="cat-card-icon">♠️</div>
+        <div class="cat-card-name">Card Games</div>
+        <div class="cat-card-desc">Blackjack, Rummy, Cribbage, Phase 10, Skull King, Euchre, and more with full score tracking.</div>
+        <div class="cat-card-count">15+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#15939e,#0d6870)">
+        <div class="cat-card-icon">🎯</div>
+        <div class="cat-card-name">Board Games</div>
+        <div class="cat-card-desc">Ticket to Ride, Carcassonne, Scrabble, Wingspan, 7 Wonders, Azul, and more.</div>
+        <div class="cat-card-count">10+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#7e28a8,#551880)">
+        <div class="cat-card-icon">🎲</div>
+        <div class="cat-card-name">Dice Games</div>
+        <div class="cat-card-desc">Yahtzee, Farkle, Qwixx, Zombie Dice, Liar's Dice, and Dice 10,000 with smart scorecards.</div>
+        <div class="cat-card-count">8+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#3a8a4a,#226030)">
+        <div class="cat-card-icon">🀄</div>
+        <div class="cat-card-name">Tile &amp; Domino</div>
+        <div class="cat-card-desc">Qwirkle, Mexican Train, Azul, and more tile-based games with dedicated score helpers.</div>
+        <div class="cat-card-count">5+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#226ec0,#154a88)">
+        <div class="cat-card-icon">🏆</div>
+        <div class="cat-card-name">Sports</div>
+        <div class="cat-card-desc">Tennis, Basketball, Golf, Darts, Bowling, Pickleball, and more real-time score trackers.</div>
+        <div class="cat-card-count">8+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#1a7040,#0e4828)">
+        <div class="cat-card-icon">🖥️</div>
+        <div class="cat-card-name">You vs Computer</div>
+        <div class="cat-card-desc">Blackjack, Yahtzee, Checkers, Connect Four, Word Guess, Finger Hockey, and Roulette.</div>
+        <div class="cat-card-count">7+ games</div>
+      </div>
+      <div class="cat-card" style="background:linear-gradient(135deg,#4428a0,#2c1870)">
+        <div class="cat-card-icon">👥</div>
+        <div class="cat-card-name">Group Games</div>
+        <div class="cat-card-desc">Tapple, Bunco, Skull King, Spectrum Guess, and Impostor — made for groups of 4 or more.</div>
+        <div class="cat-card-count">6+ games</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PERKS
+     ════════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-eyebrow">Why ScoreKeeper</div>
+  <h2 class="section-title">Built for players, not apps</h2>
+  <p class="section-sub">No sign-ups, no subscriptions, no tracking. Just a great scorekeeper that stays out of your way.</p>
+  <div class="perks-grid">
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#FEF0EF">🔒</div>
+      <div class="perk-title">100% Private</div>
+      <div class="perk-desc">All your game data stays on your device. No servers, no accounts, no data collection — ever.</div>
+    </div>
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#EEF9F0">💾</div>
+      <div class="perk-title">Save &amp; Resume</div>
+      <div class="perk-desc">Walk away mid-game and come back later. Every game is automatically saved and can be resumed.</div>
+    </div>
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#EFF4FE">🎮</div>
+      <div class="perk-title">Real Mini-Games</div>
+      <div class="perk-desc">Playable Blackjack, Finger Hockey, Checkers, Connect Four, and Word Guess — not just scorecards.</div>
+    </div>
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#F5F0FE">🤖</div>
+      <div class="perk-title">Smart AI Opponents</div>
+      <div class="perk-desc">Challenge a real computer opponent in Yahtzee, Blackjack, Connect Four, Checkers, and more.</div>
+    </div>
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#FDF8EA">👤</div>
+      <div class="perk-title">Player Profiles</div>
+      <div class="perk-desc">Save your regular players, track their game history, and quickly add them to any new game.</div>
+    </div>
+    <div class="perk-card">
+      <div class="perk-icon" style="background:#EDF9F5">📋</div>
+      <div class="perk-title">Game History</div>
+      <div class="perk-desc">Browse past games, see who won, and pick up any saved game right where you left off.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     PRIVACY POLICY
+     ════════════════════════════════════════════════════════════════ -->
+<div class="band">
+  <div class="section" id="privacy">
+    <div class="section-eyebrow">Legal</div>
+    <h2 class="section-title">Privacy Policy</h2>
+    <div class="prose">
+      <span class="updated">Last updated: May 2025</span>
+
+      <h3>Overview</h3>
+      <p>
+        ScoreKeeper ("the App") is a score-tracking and game-utility application developed for iPhone and iPad.
+        We are committed to protecting your privacy. This policy describes what information the App handles and how.
+      </p>
+
+      <h3>Information We Collect</h3>
+      <p>
+        <strong>We do not collect any personal information.</strong> The App does not require an account,
+        does not connect to the internet, and does not transmit any data to external servers or third parties.
+      </p>
+      <p>All data you create inside the App — player names, scores, game history, and settings — is stored
+        exclusively in local storage on your device using Apple's SwiftData framework. This data never leaves
+        your device unless you explicitly back it up through iCloud or iTunes (governed by Apple's own privacy policies).
+      </p>
+
+      <h3>Data Stored Locally on Your Device</h3>
+      <ul>
+        <li>Player names and avatars you create</li>
+        <li>Game scores and session history</li>
+        <li>Game settings and preferences</li>
+        <li>App usage stats (e.g. how often you play a game) — used only for sorting your frequently played games</li>
+      </ul>
+      <p>You can delete all app data at any time by uninstalling the App from your device.</p>
+
+      <h3>Third-Party Services</h3>
+      <p>
+        The App does not integrate any third-party analytics, advertising, crash-reporting, or tracking SDKs.
+        There are no ads, no in-app purchase paywalls, and no telemetry of any kind.
+      </p>
+
+      <h3>Children's Privacy</h3>
+      <p>
+        The App does not collect personal information from anyone, including children under the age of 13.
+        It is safe for use by all ages.
+      </p>
+
+      <h3>iCloud &amp; Device Backups</h3>
+      <p>
+        If you have iCloud backup enabled on your device, your local app data may be included in those backups.
+        This is governed by <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple's Privacy Policy</a>.
+        We have no access to that data.
+      </p>
+
+      <h3>Changes to This Policy</h3>
+      <p>
+        We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date above.
+        Continued use of the App after changes constitutes acceptance of the updated policy.
+      </p>
+
+      <h3>Contact</h3>
+      <p>
+        If you have any questions about this Privacy Policy, please reach out via the
+        <a href="#feedback">Feedback</a> section below.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     FEEDBACK
+     ════════════════════════════════════════════════════════════════ -->
+<div class="section" id="feedback">
+  <div class="section-eyebrow">Get in touch</div>
+  <h2 class="section-title">We'd love your feedback</h2>
+  <p class="section-sub">Found a bug? Have a game you'd like to see added? Just want to say hi? We're all ears.</p>
+
+  <div class="feedback-card">
+    <h3>Send us a message</h3>
+    <p>
+      We read every message and use your feedback to prioritise new features and fixes.
+      Response times may vary, but we always try to reply.
+    </p>
+    <div class="feedback-methods">
+      <a href="mailto:feedback@scorekeeperapp.com" class="feedback-method">
+        <div class="feedback-method-icon" style="background:#FEF0EF">✉️</div>
+        <div class="feedback-method-text">
+          <span class="feedback-method-label">Email Us</span>
+          <span class="feedback-method-sub">feedback@scorekeeperapp.com</span>
+        </div>
+      </a>
+      <a href="https://github.com" target="_blank" rel="noopener" class="feedback-method">
+        <div class="feedback-method-icon" style="background:#F0F0F0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#1C1C1E"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.01 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </div>
+        <div class="feedback-method-text">
+          <span class="feedback-method-label">Open an Issue on GitHub</span>
+          <span class="feedback-method-sub">For bug reports and feature requests</span>
+        </div>
+      </a>
+      <a href="https://apps.apple.com" target="_blank" rel="noopener" class="feedback-method">
+        <div class="feedback-method-icon" style="background:#F0F7FF">⭐</div>
+        <div class="feedback-method-text">
+          <span class="feedback-method-label">Leave a Review on the App Store</span>
+          <span class="feedback-method-sub">Reviews help others discover ScoreKeeper</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════════
+     FOOTER
+     ════════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <a class="footer-logo" href="#">
+      <div class="footer-logo-icon">🎯</div>
+      ScoreKeeper
+    </a>
+    <span class="footer-copy">© 2025 ScoreKeeper. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#feedback">Feedback</a>
+      <a href="#download">Download</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
