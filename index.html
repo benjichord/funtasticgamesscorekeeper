@@ -263,17 +263,6 @@
       position: relative;
     }
 
-    .phone-notch {
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90px; height: 28px;
-      background: #1C1C1E;
-      border-radius: 0 0 18px 18px;
-      z-index: 2;
-    }
-
     .phone-screen {
       background: var(--cream);
       border-radius: 34px;
@@ -283,27 +272,43 @@
       flex-direction: column;
     }
 
-    /* Fake status bar */
+    /* Status bar with Dynamic Island */
     .phone-statusbar {
-      height: 46px;
+      height: 52px;
       background: var(--cream);
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
-      padding: 0 20px 6px;
+      padding: 0 18px;
+      position: relative;
       flex-shrink: 0;
+    }
+
+    /* Dynamic Island pill — lives inside the screen */
+    .phone-dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 82px;
+      height: 26px;
+      background: #1C1C1E;
+      border-radius: 13px;
+      z-index: 2;
     }
 
     .phone-statusbar .time {
       font-size: 11px;
       font-weight: 900;
       color: var(--brown);
+      padding-top: 4px;
     }
 
     .phone-statusbar .icons {
       display: flex;
       gap: 5px;
       align-items: center;
+      padding-top: 4px;
     }
 
     .phone-statusbar .icons span {
@@ -724,6 +729,7 @@
       .phone-wrap { order: -1; }
       .phone { width: 240px; }
       .phone-screen { height: 480px; }
+      .phone-dynamic-island { width: 70px; height: 22px; top: 9px; }
     }
 
     @media (max-width: 560px) {
@@ -792,11 +798,11 @@
   <!-- CSS Phone Mockup -->
   <div class="phone-wrap">
     <div class="phone">
-      <div class="phone-notch"></div>
       <div class="phone-screen">
         <div class="phone-statusbar">
           <span class="time">9:41</span>
-          <div class="icons"><span>●●●</span><span>WiFi</span><span>100%</span></div>
+          <div class="phone-dynamic-island"></div>
+          <div class="icons"><span>▲▲▲</span><span>100%</span></div>
         </div>
         <div class="phone-navbar">
           <div class="title">ScoreKeeper</div>
